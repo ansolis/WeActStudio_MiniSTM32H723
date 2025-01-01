@@ -57,6 +57,7 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define TFT96 1
 #define BLUE_LED_Pin GPIO_PIN_3
 #define BLUE_LED_GPIO_Port GPIOE
 #define BUTTON_Pin GPIO_PIN_13

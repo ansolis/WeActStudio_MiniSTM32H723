@@ -28,7 +28,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "lcd.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -112,6 +112,14 @@ int main(void)
 
   HAL_TIMEx_PWMN_Start(&LCD_BACKLIGHT_TIMER, LCD_BACKLIGHT_CHAN);
 
+  LCD_Test();
+
+
+  char text_buf[100];
+  uint8_t counter = 0;
+
+  LCD_SetBrightness(80);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -124,6 +132,10 @@ int main(void)
 
 	HAL_GPIO_TogglePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin);
 	HAL_Delay(1000);
+
+	counter++;
+	snprintf(text_buf, sizeof(text_buf), "Hello world! (%u)", counter);
+	LCD_ShowString(4, 58, 160, 16, 16, (uint8_t*)text_buf);
   }
   /* USER CODE END 3 */
 }
