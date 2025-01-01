@@ -5,14 +5,14 @@
 
 #include "main.h"
 
-//SPI��ʾ���ӿ�
+//SPI display interface
 //LCD_RST
-#define LCD_RST_SET     
-#define LCD_RST_RESET  
-//LCD_RS//dc  
-#define LCD_RS_SET      HAL_GPIO_WritePin(LCD_WR_RS_GPIO_Port,LCD_WR_RS_Pin,GPIO_PIN_SET)//PC4 
+#define LCD_RST_SET
+#define LCD_RST_RESET
+//LCD_RS/DC
+#define LCD_RS_SET      HAL_GPIO_WritePin(LCD_WR_RS_GPIO_Port,LCD_WR_RS_Pin,GPIO_PIN_SET)//PC4
 #define LCD_RS_RESET    HAL_GPIO_WritePin(LCD_WR_RS_GPIO_Port,LCD_WR_RS_Pin,GPIO_PIN_RESET)
-//LCD_CS  
+//LCD_CS
 #define LCD_CS_SET      HAL_GPIO_WritePin(LCD_CS_GPIO_Port,LCD_CS_Pin,GPIO_PIN_SET)
 #define LCD_CS_RESET    HAL_GPIO_WritePin(LCD_CS_GPIO_Port,LCD_CS_Pin,GPIO_PIN_RESET)
 //SPI Driver
@@ -48,7 +48,7 @@ uint32_t st7735_id;
 void LCD_Test(void)
 {
 	uint8_t text[20];
-	
+
 	#ifdef TFT96
 	ST7735Ctx.Orientation = ST7735_ORIENTATION_LANDSCAPE_ROT180;
 	ST7735Ctx.Panel = HannStar_Panel;
@@ -59,24 +59,24 @@ void LCD_Test(void)
 	ST7735Ctx.Type = ST7735_1_8a_inch_screen;
 	#else
 	error "Unknown Screen"
-	
+
 	#endif
-	
+
 	ST7735_RegisterBusIO(&st7735_pObj,&st7735_pIO);
 	ST7735_LCD_Driver.Init(&st7735_pObj,ST7735_FORMAT_RBG565,&ST7735Ctx);
 	ST7735_LCD_Driver.ReadID(&st7735_pObj,&st7735_id);
-	
+
 	LCD_SetBrightness(0);
-	
-	#ifdef TFT96
+
+#ifdef TFT96
 	extern unsigned char WeActStudiologo_160_80[];
 	ST7735_LCD_Driver.DrawBitmap(&st7735_pObj,0,0,WeActStudiologo_160_80);
-	#elif TFT18
+#elif TFT18
 	extern unsigned char WeActStudiologo_128_160[];
-	ST7735_LCD_Driver.DrawBitmap(&st7735_pObj,0,0,WeActStudiologo_128_160);	
-	#endif
-	
-  uint32_t tick = get_tick();
+	ST7735_LCD_Driver.DrawBitmap(&st7735_pObj,0,0,WeActStudiologo_128_160);
+#endif
+
+    uint32_t tick = get_tick();
 	while (HAL_GPIO_ReadPin(BUTTON_GPIO_Port, BUTTON_Pin) != GPIO_PIN_SET)
 	{
 		delay_ms(10);
@@ -121,154 +121,153 @@ uint32_t LCD_GetBrightness(void)
 }
 
 
-// ��Ļ�𽥱������߱䰵
-// Brightness_Dis: Ŀ��ֵ
-// time: �ﵽĿ��ֵ��ʱ��,��λ: ms
+// The screen gradually brightens or dims
+// Brightness_Dis: target brightness
+// time: time to reach the target brightness, in ms
 void LCD_Light(uint32_t Brightness_Dis,uint32_t time)
 {
 	uint32_t Brightness_Now;
 	uint32_t time_now;
 	float temp1,temp2;
 	float k,set;
-	
+
 	Brightness_Now = LCD_GetBrightness();
 	time_now = 0;
 	if(Brightness_Now == Brightness_Dis)
 		return;
-	
+
 	if(time == time_now)
 		return;
-	
+
 	temp1 = Brightness_Now;
 	temp1 = temp1 - Brightness_Dis;
 	temp2 = time_now;
 	temp2 = temp2 - time;
-	
+
 	k = temp1 / temp2;
-	
+
 	uint32_t tick=get_tick();
 	while(1)
 	{
 		delay_ms(1);
-		
+
 		time_now = get_tick()-tick;
-		
+
 		temp2 = time_now - 0;
-		
+
 		set = temp2*k + Brightness_Now;
-		
+
 		LCD_SetBrightness((uint32_t)set);
-		
+
 		if(time_now >= time) break;
-		
+
 	}
 }
-	
-uint16_t POINT_COLOR=0xFFFF;	//������ɫ
-uint16_t BACK_COLOR=BLACK;  //����ɫ 
-//��ָ��λ����ʾһ���ַ�
-//x,y:��ʼ����
-//num:Ҫ��ʾ���ַ�:" "--->"~"
-//size:�����С 12/16
-//mode:���ӷ�ʽ(1)���Ƿǵ��ӷ�ʽ(0)  
 
+uint16_t POINT_COLOR=0xFFFF;	// Brush color
+uint16_t BACK_COLOR=BLACK;  // Background color
+// Display a character at the specified coordinates
+//x,y: Starting coordinates
+//num: Characters to display: " "--->"~"
+//size: Font size: 12/16
+//mode: Overlay mode (1) or non-overlay mode (0)
 void LCD_ShowChar(uint16_t x,uint16_t y,uint8_t num,uint8_t size,uint8_t mode)
-{  							  
+{
   uint8_t temp,t1,t;
 	uint16_t y0=y;
 	uint16_t x0=x;
-	uint16_t colortemp=POINT_COLOR; 
+	uint16_t colortemp=POINT_COLOR;
   uint32_t h,w;
-	
+
 	uint16_t write[size][size==12?6:8];
 	uint16_t count;
-	
+
   ST7735_GetXSize(&st7735_pObj,&w);
 	ST7735_GetYSize(&st7735_pObj,&h);
-	
-	//���ô���		   
-	num=num-' ';//�õ�ƫ�ƺ��ֵ
+
+	//Set up the window
+	num=num-' ';//Get the offset value
 	count = 0;
-	
-	if(!mode) //�ǵ��ӷ�ʽ
+
+	if(!mode) // Non-overlapping mode
 	{
 		for(t=0;t<size;t++)
-		{   
-			if(size==12)temp=asc2_1206[num][t];  //����1206����
-			else temp=asc2_1608[num][t];		 //����1608����
-			
+		{
+			if(size==12)temp=asc2_1206[num][t];  // Use 1206 font
+			else temp=asc2_1608[num][t];		 // Use 1608 font
+
 			for(t1=0;t1<8;t1++)
-			{			    
+			{
 				if(temp&0x80)
 					POINT_COLOR=(colortemp&0xFF)<<8|colortemp>>8;
-				else 
+				else
 					POINT_COLOR=(BACK_COLOR&0xFF)<<8|BACK_COLOR>>8;
-				
+
 				write[count][t/2]=POINT_COLOR;
 				count ++;
 				if(count >= size) count =0;
-				
+
 				temp<<=1;
 				y++;
-				if(y>=h){POINT_COLOR=colortemp;return;}//��������
+				if(y>=h){POINT_COLOR=colortemp;return;}// Out of bounds
 				if((y-y0)==size)
 				{
 					y=y0;
 					x++;
-					if(x>=w){POINT_COLOR=colortemp;return;}//��������
+					if(x>=w){POINT_COLOR=colortemp;return;}// Out of bounds
 					break;
 				}
 			}
 		}
 	}
-	else//���ӷ�ʽ
+	else// Overlay mode
 	{
 		for(t=0;t<size;t++)
-		{   
-			if(size==12)temp=asc2_1206[num][t];  //����1206����
-			else temp=asc2_1608[num][t];		 //����1608���� 	                          
+		{
+			if(size==12)temp=asc2_1206[num][t];  // Use 1206 font
+			else temp=asc2_1608[num][t];		 // Use 1608 font
 			for(t1=0;t1<8;t1++)
-			{			    
+			{
 				if(temp&0x80)
 					write[count][t/2]=(POINT_COLOR&0xFF)<<8|POINT_COLOR>>8;
 				count ++;
 				if(count >= size) count =0;
-				
+
 				temp<<=1;
 				y++;
-				if(y>=h){POINT_COLOR=colortemp;return;}//��������
+				if(y>=h){POINT_COLOR=colortemp;return;} // Out of bounds
 				if((y-y0)==size)
 				{
 					y=y0;
 					x++;
-					if(x>=w){POINT_COLOR=colortemp;return;}//��������
+					if(x>=w){POINT_COLOR=colortemp;return;} // Out of bounds
 					break;
 				}
-			}  	 
-		}     
+			}
+		}
 	}
-	ST7735_FillRGBRect(&st7735_pObj,x0,y0,(uint8_t *)&write,size==12?6:8,size); 
-	POINT_COLOR=colortemp;	    	   	 	  
-}   
+	ST7735_FillRGBRect(&st7735_pObj,x0,y0,(uint8_t *)&write,size==12?6:8,size);
+	POINT_COLOR=colortemp;
+}
 
-//��ʾ�ַ���
-//x,y:�������
-//width,height:�����С  
-//size:�����С
-//*p:�ַ�����ʼ��ַ
+// Display a string at the specified coordinates
+// x,y: Starting coordinates
+// width,height: Window size
+// size: Font size: 12/16
+// *p: Starting address of the string
 void LCD_ShowString(uint16_t x,uint16_t y,uint16_t width,uint16_t height,uint8_t size,uint8_t *p)
-{         
+{
 	uint8_t x0=x;
 	width+=x;
 	height+=y;
-    while((*p<='~')&&(*p>=' '))//�ж��ǲ��ǷǷ��ַ�!
-    {       
+    while((*p<='~')&&(*p>=' '))// Check if the string is valid
+    {
         if(x>=width){x=x0;y+=size;}
-        if(y>=height)break;//�˳�
+        if(y>=height)break;
         LCD_ShowChar(x,y,*p,size,0);
         x+=size/2;
         p++;
-    }  
+    }
 }
 
 static int32_t lcd_init(void)
@@ -305,7 +304,7 @@ static int32_t lcd_readreg(uint8_t reg,uint8_t* pdata)
 	int32_t result;
 	LCD_CS_RESET;
 	LCD_RS_RESET;
-	
+
 	result = HAL_SPI_Transmit(SPI_Drv,&reg,1,100);
 	LCD_RS_SET;
 	result += HAL_SPI_Receive(SPI_Drv,pdata,1,500);
@@ -344,4 +343,3 @@ static int32_t lcd_recvdata(uint8_t* pdata,uint32_t length)
 		result = 0;}
 	return result;
 }
-

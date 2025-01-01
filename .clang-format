@@ -1,0 +1,15 @@
+BasedOnStyle: LLVM
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+BreakBeforeBraces: Allman
+AllowShortIfStatementsOnASingleLine: false
+# ColumnLimit: 80
+PointerAlignment: Left
+SpacesBeforeTrailingComments: 1
+CStandard: c11
+SortIncludes: true
+SpaceAfterControlStatementKeyword: true
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeParens: ControlStatements
+IndentPPDirectives: None
