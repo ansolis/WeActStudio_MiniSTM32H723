@@ -1,4 +1,6 @@
-# WeActStudio_MiniSTM32H723
+# WeActStudio_MiniSTM32H723 Board
+
+## Overview
 Firmware projects for the MiniSTM32H723 board from WeActStudio.
 Partially based on the examples from https://github.com/WeActStudio/WeActStudio.MiniSTM32H723
 
@@ -23,3 +25,22 @@ HW:
 
 
 The project was created in STM32CubeIDE 1.17.0
+
+## Add clang-format support
+1. Install [clang-format](https://marketplace.visualstudio.com/items?itemName=xaver.clang-format)
+extension for VSCode called "Clang-Format" by Xaver Hellauer.
+2. Install clang-format for Windows by either downloading LLVM from [here](https://releases.llvm.org/)
+or running the following command in the VSCode terminal:
+```
+winget install -e --id LLVM.LLVM
+```
+3. Add the following to the VSCode settings.json user or workspace file (CTRL+SHIFT+P, then
+type in "settings.json" to open the settings file):
+```
+    "editor.formatOnSave": true,
+    "clang-format.executable": "C:\\Program Files\\LLVM\\bin\\clang-format.exe",
+    "[c]": {
+        "editor.defaultFormatter": "xaver.clang-format"
+    }
+```
+4. Restart VSCode.
