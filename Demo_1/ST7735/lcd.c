@@ -4,6 +4,7 @@
 #include "tim.h"
 
 #include "main.h"
+#include <stdio.h>
 
 // SPI display interface
 // LCD_RST
@@ -58,7 +59,6 @@ void LCD_Test(void) {
     ST7735Ctx.Type        = ST7735_1_8a_inch_screen;
 #else
     error "Unknown Screen"
-
 #endif
 
     ST7735_RegisterBusIO(&st7735_pObj, &st7735_pIO);
@@ -83,11 +83,10 @@ void LCD_Test(void) {
             LCD_SetBrightness((get_tick() - tick) * 100 / 1000);
         else if (get_tick() - tick <= 3000) {
             sprintf((char*)&text, "%03lu", (get_tick() - tick - 1000) / 10);
-            LCD_ShowString(ST7735Ctx.Width - 30, 1, ST7735Ctx.Width, 16, 16,
-                           text);
-            ST7735_LCD_Driver.FillRect(
-                &st7735_pObj, 0, ST7735Ctx.Height - 3,
-                (get_tick() - tick - 1000) * ST7735Ctx.Width / 2000, 3, 0xFFFF);
+            LCD_ShowString(ST7735Ctx.Width - 30, 1, ST7735Ctx.Width, 16, 16, text);
+            ST7735_LCD_Driver.FillRect(&st7735_pObj, 0, ST7735Ctx.Height - 3,
+                                       (get_tick() - tick - 1000) * ST7735Ctx.Width / 2000, 3,
+                                       FOREGROUND_COLOR);
         } else if (get_tick() - tick > 3000) {
             break;
         }
@@ -97,8 +96,7 @@ void LCD_Test(void) {
     }
     LCD_Light(0, 300);
 
-    ST7735_LCD_Driver.FillRect(&st7735_pObj, 0, 0, ST7735Ctx.Width,
-                               ST7735Ctx.Height, BLACK);
+    ST7735_LCD_Driver.FillRect(&st7735_pObj, 0, 0, ST7735Ctx.Width, ST7735Ctx.Height, BLACK);
 
     sprintf((char*)&text, "WeAct Studio");
     LCD_ShowString(4, 4, ST7735Ctx.Width, 16, 16, text);
@@ -111,8 +109,7 @@ void LCD_Test(void) {
 }
 
 void LCD_SetBrightness(uint32_t Brightness) {
-    __HAL_TIM_SetCompare(LCD_Brightness_timer, LCD_Brightness_channel,
-                         Brightness);
+    __HAL_TIM_SetCompare(LCD_Brightness_timer, LCD_Brightness_channel, Brightness);
 }
 
 uint32_t LCD_GetBrightness(void) {
@@ -160,19 +157,18 @@ void LCD_Light(uint32_t Brightness_Dis, uint32_t time) {
     }
 }
 
-uint16_t POINT_COLOR = 0xFFFF; // Brush color
-uint16_t BACK_COLOR  = BLACK;  // Background color
+uint16_t FOREGROUND_COLOR = WHITE;
+uint16_t BACKGROUND_COLOR = BLACK;
 // Display a character at the specified coordinates
 // x,y: Starting coordinates
 // num: Characters to display: " "--->"~"
 // size: Font size: 12/16
 // mode: Overlay mode (1) or non-overlay mode (0)
-void LCD_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size,
-                  uint8_t mode) {
+void LCD_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size, uint8_t mode) {
     uint8_t  temp, t1, t;
     uint16_t y0        = y;
     uint16_t x0        = x;
-    uint16_t colortemp = POINT_COLOR;
+    uint16_t colortemp = FOREGROUND_COLOR;
     uint32_t h, w;
 
     uint16_t write[size][size == 12 ? 6 : 8];
@@ -188,18 +184,20 @@ void LCD_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size,
     if (!mode) // Non-overlapping mode
     {
         for (t = 0; t < size; t++) {
-            if (size == 12)
+            if (size == 12) {
                 temp = asc2_1206[num][t]; // Use 1206 font
-            else
+            } else {
                 temp = asc2_1608[num][t]; // Use 1608 font
+            }
 
             for (t1 = 0; t1 < 8; t1++) {
-                if (temp & 0x80)
-                    POINT_COLOR = (colortemp & 0xFF) << 8 | colortemp >> 8;
-                else
-                    POINT_COLOR = (BACK_COLOR & 0xFF) << 8 | BACK_COLOR >> 8;
+                if (temp & 0x80) {
+                    FOREGROUND_COLOR = (colortemp & 0xFF) << 8 | colortemp >> 8;
+                } else {
+                    FOREGROUND_COLOR = (BACKGROUND_COLOR & 0xFF) << 8 | BACKGROUND_COLOR >> 8;
+                }
 
-                write[count][t / 2] = POINT_COLOR;
+                write[count][t / 2] = FOREGROUND_COLOR;
                 count++;
                 if (count >= size)
                     count = 0;
@@ -207,16 +205,20 @@ void LCD_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size,
                 temp <<= 1;
                 y++;
                 if (y >= h) {
-                    POINT_COLOR = colortemp;
+                    // Out of bounds
+                    FOREGROUND_COLOR = colortemp;
                     return;
-                } // Out of bounds
+                }
+
                 if ((y - y0) == size) {
                     y = y0;
                     x++;
                     if (x >= w) {
-                        POINT_COLOR = colortemp;
+                        // Out of bounds
+                        FOREGROUND_COLOR = colortemp;
                         return;
-                    } // Out of bounds
+                    }
+
                     break;
                 }
             }
@@ -224,14 +226,14 @@ void LCD_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size,
     } else // Overlay mode
     {
         for (t = 0; t < size; t++) {
-            if (size == 12)
+            if (size == 12) {
                 temp = asc2_1206[num][t]; // Use 1206 font
-            else
+            } else {
                 temp = asc2_1608[num][t]; // Use 1608 font
+            }
             for (t1 = 0; t1 < 8; t1++) {
                 if (temp & 0x80)
-                    write[count][t / 2] =
-                        (POINT_COLOR & 0xFF) << 8 | POINT_COLOR >> 8;
+                    write[count][t / 2] = (FOREGROUND_COLOR & 0xFF) << 8 | FOREGROUND_COLOR >> 8;
                 count++;
                 if (count >= size)
                     count = 0;
@@ -239,24 +241,25 @@ void LCD_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size,
                 temp <<= 1;
                 y++;
                 if (y >= h) {
-                    POINT_COLOR = colortemp;
+                    // Out of bounds
+                    FOREGROUND_COLOR = colortemp;
                     return;
-                } // Out of bounds
+                }
                 if ((y - y0) == size) {
                     y = y0;
                     x++;
                     if (x >= w) {
-                        POINT_COLOR = colortemp;
+                        // Out of bounds
+                        FOREGROUND_COLOR = colortemp;
                         return;
-                    } // Out of bounds
+                    }
                     break;
                 }
             }
         }
     }
-    ST7735_FillRGBRect(&st7735_pObj, x0, y0, (uint8_t*)&write,
-                       size == 12 ? 6 : 8, size);
-    POINT_COLOR = colortemp;
+    ST7735_FillRGBRect(&st7735_pObj, x0, y0, (uint8_t*)&write, size == 12 ? 6 : 8, size);
+    FOREGROUND_COLOR = colortemp;
 }
 
 // Display a string at the specified coordinates
@@ -264,8 +267,8 @@ void LCD_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size,
 // width,height: Window size
 // size: Font size: 12/16
 // *p: Starting address of the string
-void LCD_ShowString(uint16_t x, uint16_t y, uint16_t width, uint16_t height,
-                    uint8_t size, uint8_t* p) {
+void LCD_ShowString(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t size,
+                    uint8_t* p) {
     uint8_t x0 = x;
     width += x;
     height += y;
