@@ -1,0 +1,5 @@
+.PHONY: rebuild
+# Clean and rebuild the project
+rebuild:
+	$(MAKE) clean
+	$(MAKE) all
