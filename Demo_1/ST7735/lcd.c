@@ -171,7 +171,7 @@ void LCD_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t size, uint8_t mod
     uint16_t colortemp = FOREGROUND_COLOR;
     uint32_t h, w;
 
-    uint16_t write[size][size == 12 ? 6 : 8];
+    uint16_t write[size][size == 12 ? 6 : 8]; // 12x6 or 16x8 character size
     uint16_t count;
 
     ST7735_GetXSize(&st7735_pObj, &w);
