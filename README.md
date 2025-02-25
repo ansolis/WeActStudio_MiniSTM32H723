@@ -8,7 +8,7 @@ Board: WeAct-STM32H723VGT6 STM32H723 STM32H7 STM32 Core Board Demo Board purchas
 from: https://www.aliexpress.us/item/3256805686623352.html
 
 HW:
-- STM32H723VGT6
+- STM32H723VGT6 (100-pin)
 - 550Mhz Max. Freq
 - 1024KB ROM, 564KB RAM
 - 8MB SPI Flash
@@ -44,3 +44,56 @@ type in "settings.json" to open the settings file):
     }
 ```
 4. Restart VSCode.
+
+
+## Pin Mapping
+SPI1 - SPI Flash:
+- SPI1_SCK:  PB3
+- SPI1_MOSI: PD7
+- SPI1_MISO: PB4
+- SPI_FLASH_CS: PD6
+
+QSPI1 - QSPI Flash:
+- QSPI_BK1_IO3: PD13
+- QSPI_BK1_IO2: PE2
+- QSPI_BK1_IO1: PD12
+- QSPI_BK1_IO0: PD11
+- QSPI_CLK:     PB2
+- QSPI_BK1_NCS: PB6
+
+SPI4 - LCD:
+- SPI1_SCK:  PE12
+- SPI1_MOSI: PE14
+- LCD_WR_RS: PE13
+- LCD_CS:    PE11
+- LCD_BL:    PE10
+
+USB-OTG:
+- DM: PA11
+- DP: PA12
+
+Button:
+- PC13
+
+Blue LED:
+- PE3
+
+SPI2 - Available
+- SPI2_SCK:  PA9, PA12, PB10, PB13, PD3
+- SPI2_MOSI: PC1, PC3, PB15
+- SPI2_MISO: PB14, PC2
+
+SPI3 - Available
+- SPI3_SCK:  PC10,
+- SPI3_MOSI: PB5, PC12
+- SPI3_MISO: PC11
+
+Good choice for SPI2 on header P1:
+- SPI2_SCK:  PB13
+- SPI2_MOSI: PB15
+- SPI2_MISO: PB14
+
+Good choice for SPI3 on header P1:
+- SPI3_SCK:  PC10,
+- SPI3_MOSI: PC12
+- SPI3_MISO: PC11

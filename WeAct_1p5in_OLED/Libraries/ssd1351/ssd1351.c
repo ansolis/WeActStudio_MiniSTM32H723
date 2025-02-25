@@ -1,5 +1,4 @@
 
-#include "stm32f4xx_hal.h"
 #include "ssd1351.h"
 
 static void SSD1351_Select() {

@@ -73,6 +73,10 @@ void Error_Handler(void);
 #define LCD_WR_RS_GPIO_Port GPIOE
 #define LCD_SDA_Pin GPIO_PIN_14
 #define LCD_SDA_GPIO_Port GPIOE
+#define OLED_SPI2_SCK_Pin GPIO_PIN_13
+#define OLED_SPI2_SCK_GPIO_Port GPIOB
+#define OLED_SPI2_MOSI_Pin GPIO_PIN_15
+#define OLED_SPI2_MOSI_GPIO_Port GPIOB
 #define SPI_FLASH_CS_Pin GPIO_PIN_6
 #define SPI_FLASH_CS_GPIO_Port GPIOD
 #define SPI_FLASH_MOSI_Pin GPIO_PIN_7

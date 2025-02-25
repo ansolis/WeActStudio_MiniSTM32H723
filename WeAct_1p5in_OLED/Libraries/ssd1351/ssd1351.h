@@ -3,10 +3,11 @@
 #define __SSD1351_H__
 
 #include "fonts.h"
+#include "spi.h"
 #include <stdbool.h>
 
 /*** Redefine if necessary ***/
-#define SSD1351_SPI_PORT hspi1
+#define SSD1351_SPI_PORT hspi2
 extern SPI_HandleTypeDef SSD1351_SPI_PORT;
 
 #define SSD1351_RES_Pin       GPIO_PIN_0

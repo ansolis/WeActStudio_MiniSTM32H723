@@ -112,6 +112,7 @@ int main(void)
   MX_RNG_Init();
   MX_ADC3_Init();
   MX_SPI4_Init();
+  MX_SPI2_Init();
   /* USER CODE BEGIN 2 */
 
   SSD1351_Unselect();
@@ -202,8 +203,9 @@ void PeriphCommonClock_Config(void)
 
   /** Initializes the peripherals clock
   */
-  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USB|RCC_PERIPHCLK_SPI1
-                              |RCC_PERIPHCLK_SPI4|RCC_PERIPHCLK_CKPER;
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USB|RCC_PERIPHCLK_SPI2
+                              |RCC_PERIPHCLK_SPI1|RCC_PERIPHCLK_SPI4
+                              |RCC_PERIPHCLK_CKPER;
   PeriphClkInitStruct.PLL3.PLL3M = 25;
   PeriphClkInitStruct.PLL3.PLL3N = 192;
   PeriphClkInitStruct.PLL3.PLL3P = 2;
