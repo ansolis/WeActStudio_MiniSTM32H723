@@ -97,3 +97,25 @@ Good choice for SPI3 on header P1:
 - SPI3_SCK:  PC10,
 - SPI3_MOSI: PC12
 - SPI3_MISO: PC11
+
+
+## Using Keil uVision
+- Follow the instructions [here](https://www.keil.arm.com/mdk-community/)
+to download and install the Keil uVision software. Also, fill out the
+form with your information on the download page (this may be an optional step?).
+After completing the form, you will receive an email with a confirmation link.
+- Follow the instructions to request the free license from Keil through
+the installed uVision software.
+- More installation instruction can be found
+[here](https://developer.arm.com/documentation/101407/0541/About-uVision/Installation).
+- During the SW installation, you will be prompted to install packages for various
+devices via the Pack Installer. You can skip this step and just close the Pack
+Installer window.
+- Launch uVision you just installed and follow the instructions at the first link
+to request the free license.
+- Open the project file WeAct_Onboard_Peripherals/MDK-ARM/WeAct_Onboard_Peripherals.uvprojx
+via the Project => Open Project menu.
+- Open Project => Options for Target ..., in the Options dialog select the Target
+tab and under Code Generation, select "Use default compiler version 6".
+- You can now build the project and start debugging. The project is set up to use CMSIS-DAP
+debug probe.
