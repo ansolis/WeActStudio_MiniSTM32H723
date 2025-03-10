@@ -10,12 +10,12 @@
 #define SSD1351_SPI_PORT hspi2
 extern SPI_HandleTypeDef SSD1351_SPI_PORT;
 
-#define SSD1351_RES_Pin       GPIO_PIN_0
-#define SSD1351_RES_GPIO_Port GPIOB
-#define SSD1351_CS_Pin        GPIO_PIN_0
-#define SSD1351_CS_GPIO_Port  GPIOC
-#define SSD1351_DC_Pin        GPIO_PIN_1
-#define SSD1351_DC_GPIO_Port  GPIOC
+#define SSD1351_RES_Pin       OLED_RESET_Pin
+#define SSD1351_RES_GPIO_Port OLED_RESET_GPIO_Port
+#define SSD1351_CS_Pin        OLED_SPI_CS_Pin
+#define SSD1351_CS_GPIO_Port  OLED_SPI_CS_GPIO_Port
+#define SSD1351_DC_Pin        OLED_DC_Pin
+#define SSD1351_DC_GPIO_Port  OLED_DC_GPIO_Port
 
 // default orientation
 #define SSD1351_WIDTH  128
