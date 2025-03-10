@@ -117,8 +117,8 @@ int main(void)
     SSD1351_FillScreen(SSD1351_BLACK);
 
     for (int x = 0; x < SSD1351_WIDTH; x++) {
-     SSD1351_DrawPixel(x, 0, SSD1351_RED);
-     SSD1351_DrawPixel(x, SSD1351_HEIGHT-1, SSD1351_RED);
+      SSD1351_DrawPixel(x, 0, SSD1351_RED);
+      SSD1351_DrawPixel(x, SSD1351_HEIGHT-1, SSD1351_RED);
     }
 
     for (int y = 0; y < SSD1351_HEIGHT; y++) {
@@ -126,7 +126,7 @@ int main(void)
       SSD1351_DrawPixel(SSD1351_WIDTH-1, y, SSD1351_RED);
     }
 
-    HAL_Delay(3000);
+    HAL_Delay(1000);
 
     // Check fonts
     SSD1351_FillScreen(SSD1351_BLACK);

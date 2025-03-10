@@ -55,8 +55,12 @@ static void SSD1351_SetAddressWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint
 }
 
 void SSD1351_Init() {
-    SSD1351_Select();
+    SSD1351_Unselect();
     SSD1351_Reset();
+
+    // TODO: See if this can be reduced
+    HAL_Delay(100);
+    SSD1351_Select();
 
     // command list is based on https://github.com/adafruit/Adafruit-SSD1351-library
 
@@ -247,4 +251,3 @@ void SSD1351_InvertColors(bool invert) {
     SSD1351_WriteCommand(invert ? 0xA7 /* INVERTDISPLAY */ : 0xA6 /* NORMALDISPLAY */);
     SSD1351_Unselect();
 }
-
