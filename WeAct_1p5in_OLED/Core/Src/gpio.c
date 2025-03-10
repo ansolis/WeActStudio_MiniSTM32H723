@@ -38,6 +38,12 @@
         * Output
         * EVENT_OUT
         * EXTI
+     PE11   ------> SPI4_NSS
+     PE12   ------> SPI4_SCK
+     PE14   ------> SPI4_MOSI
+     PD7   ------> SPI1_MOSI
+     PB3(JTDO/TRACESWO)   ------> SPI1_SCK
+     PB4(NJTRST)   ------> SPI1_MISO
 */
 void MX_GPIO_Init(void)
 {
@@ -94,12 +100,36 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(OLED_RESET_GPIO_Port, &GPIO_InitStruct);
 
+  /*Configure GPIO pins : LCD_CS_Pin LCD_SCL_Pin LCD_SDA_Pin */
+  GPIO_InitStruct.Pin = LCD_CS_Pin|LCD_SCL_Pin|LCD_SDA_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  GPIO_InitStruct.Alternate = GPIO_AF5_SPI4;
+  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+
   /*Configure GPIO pin : SPI_FLASH_CS_Pin */
   GPIO_InitStruct.Pin = SPI_FLASH_CS_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(SPI_FLASH_CS_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : SPI_FLASH_MOSI_Pin */
+  GPIO_InitStruct.Pin = SPI_FLASH_MOSI_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  GPIO_InitStruct.Alternate = GPIO_AF5_SPI1;
+  HAL_GPIO_Init(SPI_FLASH_MOSI_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : SPI_FLASH_SCK_Pin PB4 */
+  GPIO_InitStruct.Pin = SPI_FLASH_SCK_Pin|GPIO_PIN_4;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  GPIO_InitStruct.Alternate = GPIO_AF5_SPI1;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
   HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
